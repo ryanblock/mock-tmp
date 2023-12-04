@@ -9,6 +9,7 @@ const str = 'hello'
 const buf = Buffer.from('hi there')
 
 const get = (...path) => readFileSync(join(...path)).toString()
+const newline = process.platform === 'win32' ? '\r\n' : '\n'
 
 test('Set up env', t => {
   t.plan(1)
@@ -55,9 +56,9 @@ test('copy()', t => {
     // `load` alias
     456: tmpFs.load(join(__dirname, '..', 'dummy', '123.txt')),
   })
-  t.equal(get(dir, 'foo', 'abc', 'def.txt'), 'abcdef\n', 'Correct file found in recursively copied directory structure')
-  t.equal(get(dir, 'foo', '123.txt'), '123\n', 'Correct file found in recursively copied directory structure')
-  t.equal(get(dir, '456'), '123\n', 'Correct file found in recursively copied directory structure')
+  t.equal(get(dir, 'foo', 'abc', 'def.txt'), 'abcdef' + newline, 'Correct file found in recursively copied directory structure')
+  t.equal(get(dir, 'foo', '123.txt'), '123' + newline, 'Correct file found in recursively copied directory structure')
+  t.equal(get(dir, '456'), '123' + newline, 'Correct file found in recursively copied directory structure')
 })
 
 test('reset()', t => {
