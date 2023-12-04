@@ -1,0 +1,36 @@
+{
+  "name": "tmp-fs",
+  "version": "0.0.0",
+  "description": "A (mostly) drop-in replacement for `mock-fs` using your tmp filesystem",
+  "homepage": "https://github.com/ryanblock/tmp-fs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ryanblock/tmp-fs.git"
+  },
+  "bugs": "https://github.com/ryanblock/tmp-fs/issues",
+  "scripts": {
+    "lint": "eslint --fix .",
+    "test": "npm run lint && npm run coverage",
+    "test:unit": "cross-env tape 'test/unit/**/*-test.js' | tap-arc",
+    "coverage": "nyc --reporter=lcov --reporter=text npm run test:unit"
+  },
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=16.7"
+  },
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@architect/eslint-config": "^2.1.2",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.55.0",
+    "nyc": "^15.1.0",
+    "tap-arc": "^1.2.2",
+    "tape": "^5.7.2"
+  },
+  "files": [
+    "src"
+  ],
+  "eslintConfig": {
+    "extends": "@architect/eslint-config"
+  }
+}
