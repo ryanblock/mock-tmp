@@ -3,12 +3,12 @@ let { tmpdir } = require('os')
 let { join, parse, sep } = require('path')
 let tmpDir
 
-function tmpFs (files, /* options */) {
-  tmpFs.reset()
+function mockTmp (files, /* options */) {
+  mockTmp.reset()
   if (typeof files !== 'object' || Array.isArray(files) || !Object.keys(files).length) {
     throw ReferenceError('Specify one or more files in an object to write to tmp')
   }
-  tmpDir = mkdtempSync(join(tmpdir(), 'tmpfs-'))
+  tmpDir = mkdtempSync(join(tmpdir(), 'mock-tmp-'))
   Object.entries(files).forEach(([ p, data ]) => {
     if (typeof data === 'object' && data.path && data.options) {
       const { recursive = true } = data.options
@@ -30,15 +30,15 @@ function tmpFs (files, /* options */) {
 /**
  * Copy files into the tmp dir
  */
-tmpFs.copy = function tmpFsCopy (path, options = {}) {
+mockTmp.copy = function mockTmpCopy (path, options = {}) {
   return { path, options }
 }
-tmpFs.load = tmpFs.copy
+mockTmp.load = mockTmp.copy
 
 /**
  * Reset the tmp dir
  */
-tmpFs.reset = function () {
+mockTmp.reset = function () {
   if (tmpDir) {
     rmSync(tmpDir, { recursive: true, force: true })
     try { unlinkSync(tmpDir) }
@@ -46,10 +46,10 @@ tmpFs.reset = function () {
     tmpDir = undefined
   }
 }
-tmpFs.restore = tmpFs.reset
+mockTmp.restore = mockTmp.reset
 
-Object.defineProperty(tmpFs, 'load', { enumerable: false })
-Object.defineProperty(tmpFs, 'restore', { enumerable: false })
+Object.defineProperty(mockTmp, 'load', { enumerable: false })
+Object.defineProperty(mockTmp, 'restore', { enumerable: false })
 
-process.on('exit', tmpFs.reset)
-module.exports = tmpFs
+process.on('exit', mockTmp.reset)
+module.exports = mockTmp

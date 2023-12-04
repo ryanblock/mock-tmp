@@ -1,7 +1,7 @@
 const { existsSync, readdirSync, readFileSync } = require('fs')
 const { join, sep } = require('path')
 const test = require('tape')
-const tmpFs = require('../../')
+const mockTmp = require('../../')
 
 const file1 = 'hello.txt'
 const file2 = 'hi.txt'
@@ -13,12 +13,12 @@ const newline = process.platform === 'win32' ? '\r\n' : '\n'
 
 test('Set up env', t => {
   t.plan(1)
-  t.ok(tmpFs, 'tmpFs is present')
+  t.ok(mockTmp, 'mockTmp is present')
 })
 
 test('Basic functionality', t => {
   t.plan(5)
-  const dir = tmpFs({
+  const dir = mockTmp({
     [file1]: str,
     [file2]: buf,
   })
@@ -30,7 +30,7 @@ test('Basic functionality', t => {
   t.equal(get(dir, files[0]), str, 'Correct file written from string')
   t.equal(get(dir, files[1]), buf.toString(), 'Correct file written from buffer')
 
-  tmpFs.reset()
+  mockTmp.reset()
   t.notOk(existsSync(dir), `tmp dir destroyed`)
 })
 
@@ -38,23 +38,23 @@ test('Nested paths', t => {
   t.plan(3)
   const nestedFileNix = 'foo/bar/baz.txt'
   const nestedFileWin = 'fiz\\buz\\biz.txt'
-  const dir = tmpFs({
+  const dir = mockTmp({
     [nestedFileNix]: str,
     [nestedFileWin]: str,
   })
   t.equal(get(dir, nestedFileNix.split('/').join(sep)), str, 'Correct file written from string')
   t.equal(get(dir, nestedFileWin.split('\\').join(sep)), str, 'Correct file written from string')
 
-  tmpFs.reset()
+  mockTmp.reset()
   t.notOk(existsSync(dir), `tmp dir destroyed`)
 })
 
 test('copy()', t => {
   t.plan(3)
-  const dir = tmpFs({
-    foo: tmpFs.copy(join(__dirname, '..', 'dummy')),
+  const dir = mockTmp({
+    foo: mockTmp.copy(join(__dirname, '..', 'dummy')),
     // `load` alias
-    456: tmpFs.load(join(__dirname, '..', 'dummy', '123.txt')),
+    456: mockTmp.load(join(__dirname, '..', 'dummy', '123.txt')),
   })
   t.equal(get(dir, 'foo', 'abc', 'def.txt'), 'abcdef' + newline, 'Correct file found in recursively copied directory structure')
   t.equal(get(dir, 'foo', '123.txt'), '123' + newline, 'Correct file found in recursively copied directory structure')
@@ -66,24 +66,24 @@ test('reset()', t => {
   let dir
 
   // Self reset
-  let old = tmpFs({ [file1]: str })
+  let old = mockTmp({ [file1]: str })
   t.ok(existsSync(old), `tmp dir created: ${old}`)
-  dir = tmpFs({ [file1]: str })
+  dir = mockTmp({ [file1]: str })
   t.notOk(existsSync(old), `Old tmp dir is destroyed`)
   t.ok(existsSync(dir), `New tmp dir created: ${dir}`)
 
   // Can be run idempotently
-  dir = tmpFs({ [file1]: str })
+  dir = mockTmp({ [file1]: str })
   t.ok(existsSync(dir), `tmp dir created: ${dir}`)
-  tmpFs.reset()
+  mockTmp.reset()
   t.notOk(existsSync(dir), `tmp dir destroyed`)
-  tmpFs.reset()
+  mockTmp.reset()
   t.notOk(existsSync(dir), `tmp dir is still destroyed`)
 
   // `restore` alias
-  dir = tmpFs({ [file1]: str })
+  dir = mockTmp({ [file1]: str })
   t.ok(existsSync(dir), `tmp dir created: ${dir}`)
-  tmpFs.restore()
+  mockTmp.restore()
   t.notOk(existsSync(dir), `tmp dir destroyed`)
 })
 
@@ -92,7 +92,7 @@ test('Errors', t => {
   const typeError = /string or buffer/
 
   try {
-    tmpFs('hi')
+    mockTmp('hi')
     t.fail('Expected error')
   }
   catch (err) {
@@ -100,7 +100,7 @@ test('Errors', t => {
   }
 
   try {
-    tmpFs([ 'hi', 'there' ])
+    mockTmp([ 'hi', 'there' ])
     t.fail('Expected error')
   }
   catch (err) {
@@ -108,7 +108,7 @@ test('Errors', t => {
   }
 
   try {
-    tmpFs({})
+    mockTmp({})
     t.fail('Expected error')
   }
   catch (err) {
@@ -116,7 +116,7 @@ test('Errors', t => {
   }
 
   try {
-    tmpFs({ [file1]: 12345 })
+    mockTmp({ [file1]: 12345 })
     t.fail('Expected error')
   }
   catch (err) {
@@ -124,7 +124,7 @@ test('Errors', t => {
   }
 
   try {
-    tmpFs({ [file1]: [ 'yo' ] })
+    mockTmp({ [file1]: [ 'yo' ] })
     t.fail('Expected error')
   }
   catch (err) {

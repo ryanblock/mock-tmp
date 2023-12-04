@@ -1,15 +1,15 @@
-# `tmp-fs`
+# `mock-tmp`
 
 > A (mostly) drop-in replacement for [`mock-fs`](https://github.com/tschaub/mock-fs) using your tmp filesystem
 
 ```js
-import tmpFs from 'tmp-fs'
+import mockTmp from 'mock-tmp'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const tmp = tmpFs({
+const tmp = mockTmp({
   'hi.txt': 'hi there!'
-}) // /var/folders/.../tmpfs-$random_string
+}) // /var/folders/.../mock-tmp-$random_string
 readFileSync(join(tmp, 'hi.txt')) // 'hi there!'
 
 tmp.reset()
