@@ -10,6 +10,7 @@ const buf = Buffer.from('hi there')
 
 const get = (...path) => readFileSync(join(...path)).toString()
 const newline = process.platform === 'win32' ? '\r\n' : '\n'
+const normalizePath = path => path.replace(/[\\/]/g, sep)
 
 test('Set up env', t => {
   t.plan(1)
@@ -25,7 +26,7 @@ test('Basic functionality', t => {
   t.ok(existsSync(dir), `tmp dir created: ${dir}`)
 
   const files = readdirSync(dir).sort()
-  t.deepEqual(files, [ file1, file2 ], 'Single file wrote to tmp dir')
+  t.deepEqual(files, [ file1, file2 ], 'File written to tmp dir')
 
   t.equal(get(dir, files[0]), str, 'Correct file written from string')
   t.equal(get(dir, files[1]), buf.toString(), 'Correct file written from buffer')
@@ -42,11 +43,61 @@ test('Nested paths', t => {
     [nestedFileNix]: str,
     [nestedFileWin]: str,
   })
-  t.equal(get(dir, nestedFileNix.split('/').join(sep)), str, 'Correct file written from string')
-  t.equal(get(dir, nestedFileWin.split('\\').join(sep)), str, 'Correct file written from string')
+  t.equal(get(dir, normalizePath(nestedFileNix)), str, 'Correct file written from string')
+  t.equal(get(dir, normalizePath(nestedFileWin)), str, 'Correct file written from string')
 
   mockTmp.reset()
   t.notOk(existsSync(dir), `tmp dir destroyed`)
+})
+
+test('Create folders + contents', t => {
+  t.plan(8)
+
+  const nestedDirNix = 'foo/bar'
+  const nestedDirWin = 'fiz\\buz'
+  let checking, dir, files
+
+  // Empty dirs
+  dir = mockTmp({
+    [nestedDirNix]: {},
+    [nestedDirWin]: {},
+  })
+
+  checking = join(dir, normalizePath(nestedDirNix))
+  t.ok(existsSync(checking), `tmp dir created: ${checking}`)
+  files = readdirSync(checking)
+  t.equal(files.length, 0, `tmp dir is empty`)
+
+  checking = join(dir, normalizePath(nestedDirWin))
+  t.ok(existsSync(checking), `tmp dir created: ${checking}`)
+  files = readdirSync(checking)
+  t.equal(files.length, 0, `tmp dir is empty`)
+
+  mockTmp.reset()
+
+  // Dirs with files
+  dir = mockTmp({
+    [nestedDirNix]: {
+      [file1]: str,
+      [file2]: buf,
+    },
+    [nestedDirWin]: {
+      [file1]: str,
+      [file2]: buf,
+    },
+  })
+
+  checking = join(dir, normalizePath(nestedDirNix))
+  t.ok(existsSync(checking), `tmp dir created: ${checking}`)
+  files = readdirSync(checking).sort()
+  t.deepEqual(files, [ file1, file2 ], 'Files written to nested tmp dir')
+
+  checking = join(dir, normalizePath(nestedDirWin))
+  t.ok(existsSync(checking), `tmp dir created: ${checking}`)
+  files = readdirSync(checking).sort()
+  t.deepEqual(files, [ file1, file2 ], 'Files written to nested tmp dir')
+
+  mockTmp.reset()
 })
 
 test('copy()', t => {
