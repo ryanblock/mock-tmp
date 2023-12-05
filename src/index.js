@@ -10,9 +10,9 @@ function mockTmp (files, /* options */) {
   }
   tmpDir = mkdtempSync(join(tmpdir(), 'mock-tmp-'))
   Object.entries(files).forEach(([ p, data ]) => {
-    if (typeof data === 'object' && data.path && data.options) {
-      const { recursive = true } = data.options
-      cpSync(data.path, join(tmpDir, p), { recursive })
+    if (typeof data === 'object' && data._path && data._options) {
+      const { recursive = true } = data._options
+      cpSync(data._path, join(tmpDir, p), { recursive })
       return
     }
     if (typeof data !== 'string' && !(data instanceof Buffer)) {
@@ -30,8 +30,8 @@ function mockTmp (files, /* options */) {
 /**
  * Copy files into the tmp dir
  */
-mockTmp.copy = function mockTmpCopy (path, options = {}) {
-  return { path, options }
+mockTmp.copy = function mockTmpCopy (_path, _options = {}) {
+  return { _path, _options }
 }
 mockTmp.load = mockTmp.copy
 
