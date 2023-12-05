@@ -139,6 +139,7 @@ test('reset()', t => {
 })
 
 test('Errors', t => {
+  t.plan(5)
   const filesError = /Specify one or more files/
   const typeError = /string or buffer/
 
@@ -181,8 +182,4 @@ test('Errors', t => {
   catch (err) {
     t.match(err.message, typeError, 'Got correct type error')
   }
-
-
-
-  t.end()
 })
