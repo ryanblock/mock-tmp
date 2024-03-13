@@ -7,7 +7,8 @@ import mockTmp from 'mock-tmp'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const tmp = mockTmp({
+// tmpDir is the path to a temporary directory
+const tmpDir = mockTmp({
   // Create a single file (from a string)
   'hi.txt': 'hi there!',
 
@@ -26,9 +27,9 @@ const tmp = mockTmp({
   // Bring in an existing folder recursively; optionally disable recursion
   'so-many-files': mockTmp.copy('/path/to/many-files', /* { recursive: false} */),
 }) // /var/folders/.../mock-tmp-$random_string
-readFileSync(join(tmp, 'hi.txt')) // 'hi there!'
-readFileSync(join(tmp, 'greetings', 'and', 'salutations', 'hey.json')) // '{"hey":"friend"}'
+readFileSync(join(tmpDir, 'hi.txt')) // 'hi there!'
+readFileSync(join(tmpDir, 'greetings', 'and', 'salutations', 'hey.json')) // '{"hey":"friend"}'
 
-tmp.reset()
-existsSync(tmp) //false
+mockTmp.reset()
+existsSync(tmpDir) //false
 ```
