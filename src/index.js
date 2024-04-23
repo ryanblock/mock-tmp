@@ -47,7 +47,8 @@ mockTmp.load = mockTmp.copy
  */
 mockTmp.reset = function () {
   if (tmpDir) {
-    rmSync(tmpDir, { recursive: true, force: true })
+    try { rmSync(tmpDir, { recursive: true, force: true }) }
+    catch { /* noop */ }
     try { unlinkSync(tmpDir) }
     catch { /* noop */ }
     tmpDir = undefined

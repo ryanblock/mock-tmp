@@ -81,7 +81,7 @@ The `options` object accepts the following parameters
 
 > Alias: `mock.restore()`
 
-`mock.reset()` synchronously destroys the mock temp directory.
+`mock.reset()` attempts to synchronously destroy the mock temp directory. `mock.reset()` not guarantee the mock temp directory will be destroyed (such as in the case of existing file locks that may prevent deletion).
 
 Note: calling `mock()` cleans up after itself, and automatically calls `mock.reset()` if it has not been manually called. Still, it is good hygiene to explicitly call `mock.reset()`, especially so others may more easily read your tests.
 
